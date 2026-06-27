@@ -10,7 +10,7 @@ RUN npm ci && npm run build
 FROM php:8.2-fpm-alpine
 WORKDIR /var/www/html
 
-# Install system dependencies
+# Install system dependencies (including gettext for envsubst)
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -22,7 +22,8 @@ RUN apk add --no-cache \
     zip \
     unzip \
     git \
-    bash
+    bash \
+    gettext
 
 # Configure and install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -55,8 +56,10 @@ RUN mkdir -p storage/framework/cache/data \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache
 
-# Copy Nginx, Supervisor, and Entrypoint configurations
-COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+# Copy Nginx config as a TEMPLATE (PORT will be substituted at runtime by entrypoint)
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf.template
+
+# Copy Supervisor and Entrypoint configurations
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
@@ -64,8 +67,8 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/entrypoint.sh
 
-# Expose Nginx port
-EXPOSE 80
+# Render uses PORT env var (default 10000)
+EXPOSE 10000
 
 # Run entrypoint script
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
