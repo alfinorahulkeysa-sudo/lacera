@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+# Debug print of environment variables
+echo "APP_URL is: '${APP_URL}'"
+echo "DB_HOST is: '${DB_HOST}'"
+
 # Cache configuration if variables are set
 echo "Caching Laravel configuration..."
 php artisan config:cache
