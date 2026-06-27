@@ -7,8 +7,16 @@ echo "=== Lacera Entrypoint ==="
 export PORT="${PORT:-10000}"
 echo "PORT is: ${PORT}"
 
-# Ensure APP_URL is set and valid
+# Ensure APP_URL is set and valid (catch empty, bare scheme, or placeholder values with < >)
+APP_URL_INVALID=false
 if [ -z "${APP_URL}" ] || [ "${APP_URL}" = "http://" ] || [ "${APP_URL}" = "https://" ]; then
+    APP_URL_INVALID=true
+elif echo "${APP_URL}" | grep -q '[<>]'; then
+    echo "WARNING: APP_URL contains placeholder characters: '${APP_URL}'"
+    APP_URL_INVALID=true
+fi
+
+if [ "${APP_URL_INVALID}" = "true" ]; then
     if [ -n "${RENDER_EXTERNAL_URL}" ]; then
         export APP_URL="${RENDER_EXTERNAL_URL}"
         echo "APP_URL auto-set from RENDER_EXTERNAL_URL: ${APP_URL}"
@@ -37,6 +45,12 @@ envsubst '${PORT}' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d
 # Create storage link if not exists
 php artisan storage:link --force 2>/dev/null || true
 
+# Inject runtime APP_URL into .env so artisan commands use the correct host
+sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env
+
+# Generate application key if not set
+php artisan key:generate --force --no-interaction 2>/dev/null || true
+
 # Cache configuration
 echo "Caching Laravel configuration..."
 php artisan config:cache || echo "WARNING: config:cache failed, continuing without cache..."
@@ -54,5 +68,6 @@ if [ $# -gt 0 ]; then
     exec "$@"
 else
     echo "Starting Supervisor..."
+    mkdir -p /var/log/supervisor
     exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
 fi

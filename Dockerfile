@@ -36,7 +36,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
 
 # Install php dependencies without running scripts
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+# Falls back to --prefer-source if dist download fails (e.g. GitHub 400 errors)
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist \
+    || composer install --no-dev --no-scripts --no-autoloader --prefer-source
 
 # Copy the rest of the application files
 COPY . .
@@ -53,6 +55,7 @@ RUN mkdir -p storage/framework/cache/data \
              storage/framework/views \
              storage/logs \
              bootstrap/cache \
+             /var/log/supervisor \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache
 
