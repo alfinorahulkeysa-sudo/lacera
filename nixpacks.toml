@@ -12,7 +12,8 @@ nixPkgs = [
   "php82Extensions.openssl",
   "php82Extensions.curl",
   "php82Extensions.gd",
-  "php82Extensions.zip"
+  "php82Extensions.zip",
+  "nodejs"
 ]
 
 [phases.install]
