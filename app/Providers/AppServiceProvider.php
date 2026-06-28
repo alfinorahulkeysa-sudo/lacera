@@ -29,8 +29,8 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // Bagikan data jumlah item keranjang ke seluruh view/halaman secara otomatis
-        View::composer('*', function ($view) {
+        // Bagikan data jumlah item keranjang ke view navigasi saja
+        View::composer('layouts.navigation', function ($view) {
             if (Auth::check()) {
                 // Menghitung total quantity semua produk yang ada di keranjang user
                 $cartCount = CartItem::where('user_id', Auth::id())->sum('quantity');
