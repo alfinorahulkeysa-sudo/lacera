@@ -85,9 +85,6 @@
                                 <select class="form-select" id="payment_method" name="payment_method" required>
                                     <option value="" disabled selected>-- Pilih Metode Pembayaran --</option>
                                     <option value="qris">QRIS (All E-Wallet & M-Banking)</option>
-                                    <option value="bca_va">BCA Virtual Account</option>
-                                    <option value="bni_va">BNI Virtual Account</option>
-                                    <option value="mandiri_va">Mandiri Virtual Account</option>
                                 </select>
                             </div>
 
