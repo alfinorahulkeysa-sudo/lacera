@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BestSellerController;
 use App\Http\Controllers\BundleController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -25,14 +26,10 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserReviewController;
 
 // ✅ FIX: Tambahkan nama 'home' pada route landing page
-Route::get('/', function () {
-    return redirect()->route('login');
-})->name('home');
+Route::redirect('/', '/login')->name('home');
 
 // Railway healthcheck endpoint
-Route::get('/health', function () {
-    return response('OK', 200);
-});
+Route::get('/health', [HealthController::class, 'index'])->name('health');
 
 /**
  * --------------------------------------------------------------------------
