@@ -29,6 +29,11 @@ Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
 
+// Railway healthcheck endpoint
+Route::get('/health', function () {
+    return response('OK', 200);
+});
+
 /**
  * --------------------------------------------------------------------------
  * Rute Aplikasi Terproteksi (Harus Login & Email Terverifikasi)
