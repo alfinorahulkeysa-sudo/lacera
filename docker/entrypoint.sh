@@ -81,3 +81,7 @@ php artisan migrate --force || echo "WARNING: migrations failed, check DB connec
 echo "Starting Supervisor..."
 mkdir -p /var/log/supervisor
 exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
+
+# Paksa Laravel log ke stderr supaya muncul di Railway logs
+echo "LOG_CHANNEL=stderr" >> .env
+echo "LOG_STDERR_FORMATTER=Monolog\Formatter\LineFormatter" >> .env
