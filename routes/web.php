@@ -39,20 +39,18 @@ Route::get('/health', function () {
  * Rute Aplikasi Terproteksi (Harus Login & Email Terverifikasi)
  * --------------------------------------------------------------------------
  */
+// Public category and bundle pages
+Route::get('/kategori', [CategoryController::class, 'index'])->name('kategori');
+Route::get('/category', [CategoryController::class, 'index'])->name('category.index');
+Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
+Route::get('/bundle', [BundleController::class, 'index'])->name('bundle.index');
+
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Kategori
-    Route::get('/kategori', [CategoryController::class, 'index'])->name('kategori');
-    Route::get('/category', [CategoryController::class, 'index'])->name('category.index');
-    Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
-
     // Best Seller
     Route::get('/best-seller', [BestSellerController::class, 'index'])->name('best-seller.index');
-
-    // Bundle
-    Route::get('/bundle', [BundleController::class, 'index'])->name('bundle.index');
 
     // Promo
     Route::get('/promo', [PromoController::class, 'index'])->name('promo.index');

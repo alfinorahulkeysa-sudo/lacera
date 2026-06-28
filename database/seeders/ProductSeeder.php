@@ -22,6 +22,7 @@ class ProductSeeder extends Seeder
                 Category::create(['name' => 'Body Wash', 'slug' => 'body-wash', 'description' => 'Membersihkan kulit secara menyeluruh dengan kesegaran alami.']),
                 Category::create(['name' => 'Collagen Soap', 'slug' => 'collagen-soap', 'description' => 'Sabun kolagen untuk menjaga kekencangan dan kecerahan kulit.']),
                 Category::create(['name' => 'Lip Treatment', 'slug' => 'lip-treatment', 'description' => 'Perawatan intensif untuk bibir dan area sensitif lainnya.']),
+                Category::create(['name' => 'Bundle Package', 'slug' => 'bundle-package', 'description' => 'Paket hemat perawatan lengkap kulit cantik Anda']),
             ]);
         }
 
