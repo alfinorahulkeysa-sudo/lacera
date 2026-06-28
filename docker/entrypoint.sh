@@ -28,6 +28,13 @@ else
     echo "APP_URL is: '${APP_URL}'"
 fi
 
+# Force APP_URL to use https:// when on Render (not localhost)
+if echo "${APP_URL}" | grep -qv 'localhost'; then
+    APP_URL=$(echo "${APP_URL}" | sed 's|^http://|https://|')
+    export APP_URL
+    echo "APP_URL forced to HTTPS: ${APP_URL}"
+fi
+
 # Create .env file if it doesn't exist (required by Laravel)
 if [ ! -f .env ]; then
     echo "No .env file found, creating from .env.example..."
@@ -45,8 +52,17 @@ envsubst '${PORT}' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d
 # Create storage link if not exists
 php artisan storage:link --force 2>/dev/null || true
 
-# Inject runtime APP_URL into .env so artisan commands use the correct host
+# Inject runtime settings into .env for production on Render
 sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env
+sed -i "s|^APP_ENV=.*|APP_ENV=production|" .env
+sed -i "s|^APP_DEBUG=.*|APP_DEBUG=false|" .env
+
+# Ensure HTTPS session settings exist in .env
+if ! grep -q '^SESSION_SECURE_COOKIE=' .env; then
+    echo "SESSION_SECURE_COOKIE=true" >> .env
+else
+    sed -i "s|^SESSION_SECURE_COOKIE=.*|SESSION_SECURE_COOKIE=true|" .env
+fi
 
 # Generate application key if not set
 php artisan key:generate --force --no-interaction 2>/dev/null || true
