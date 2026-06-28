@@ -1,90 +1,83 @@
 #!/bin/sh
 set -e
 
-echo "=== Lacera Entrypoint ==="
+echo "=== Lacera Entrypoint (Railway) ==="
 
-# Ensure PORT is set (Render provides this, default 10000)
-export PORT="${PORT:-10000}"
+# PORT — Railway inject ini otomatis
+export PORT="${PORT:-8080}"
 echo "PORT is: ${PORT}"
 
-# Ensure APP_URL is set and valid (catch empty, bare scheme, or placeholder values with < >)
-APP_URL_INVALID=false
-if [ -z "${APP_URL}" ] || [ "${APP_URL}" = "http://" ] || [ "${APP_URL}" = "https://" ]; then
-    APP_URL_INVALID=true
-elif echo "${APP_URL}" | grep -q '[<>]'; then
-    echo "WARNING: APP_URL contains placeholder characters: '${APP_URL}'"
-    APP_URL_INVALID=true
-fi
-
-if [ "${APP_URL_INVALID}" = "true" ]; then
-    if [ -n "${RENDER_EXTERNAL_URL}" ]; then
-        export APP_URL="${RENDER_EXTERNAL_URL}"
-        echo "APP_URL auto-set from RENDER_EXTERNAL_URL: ${APP_URL}"
-    else
-        export APP_URL="http://localhost:${PORT}"
-        echo "APP_URL defaulted to: ${APP_URL}"
-    fi
+# APP_URL — validasi dan force HTTPS
+if [ -z "${APP_URL}" ] || echo "${APP_URL}" | grep -q '[<>]'; then
+    export APP_URL="http://localhost:${PORT}"
+    echo "APP_URL defaulted to: ${APP_URL}"
 else
     echo "APP_URL is: '${APP_URL}'"
 fi
 
-# Force APP_URL to use https:// when on Render (not localhost)
+# Force HTTPS kalau bukan localhost
 if echo "${APP_URL}" | grep -qv 'localhost'; then
     APP_URL=$(echo "${APP_URL}" | sed 's|^http://|https://|')
     export APP_URL
     echo "APP_URL forced to HTTPS: ${APP_URL}"
 fi
 
-# Create .env file if it doesn't exist (required by Laravel)
-if [ ! -f .env ]; then
-    echo "No .env file found, creating from .env.example..."
-    if [ -f .env.example ]; then
-        cp .env.example .env
-    else
-        touch .env
-    fi
-fi
+# Buat .env dari environment variables Railway (bukan dari .env.example)
+echo "Creating .env from Railway environment variables..."
+cat > .env << EOF
+APP_NAME="${APP_NAME:-Lacera}"
+APP_ENV="${APP_ENV:-production}"
+APP_KEY="${APP_KEY}"
+APP_DEBUG="${APP_DEBUG:-false}"
+APP_URL="${APP_URL}"
 
-# Substitute PORT in nginx config template
-echo "Configuring Nginx to listen on port ${PORT}..."
+LOG_CHANNEL=stderr
+LOG_LEVEL=error
+
+DB_CONNECTION="${DB_CONNECTION:-mysql}"
+DB_HOST="${DB_HOST}"
+DB_PORT="${DB_PORT:-3306}"
+DB_DATABASE="${DB_DATABASE}"
+DB_USERNAME="${DB_USERNAME}"
+DB_PASSWORD="${DB_PASSWORD}"
+
+SESSION_DRIVER="${SESSION_DRIVER:-file}"
+SESSION_LIFETIME=120
+SESSION_SECURE_COOKIE=true
+
+CACHE_DRIVER="${CACHE_DRIVER:-file}"
+QUEUE_CONNECTION="${QUEUE_CONNECTION:-sync}"
+
+PAYMENKU_API_KEY="${PAYMENKU_API_KEY}"
+PAYMENKU_BASE_URL="${PAYMENKU_BASE_URL}"
+RAJAONGKIR_API_KEY="${RAJAONGKIR_API_KEY}"
+RAJAONGKIR_ORIGIN_CITY_ID="${RAJAONGKIR_ORIGIN_CITY_ID:-23}"
+EOF
+
+echo ".env created successfully"
+
+# Konfigurasi Nginx dengan PORT yang benar
+echo "Configuring Nginx on port ${PORT}..."
 envsubst '${PORT}' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d/default.conf
 
-# Create storage link if not exists
+# Storage link
 php artisan storage:link --force 2>/dev/null || true
 
-# Inject runtime settings into .env for production on Render
-sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env
-sed -i "s|^APP_ENV=.*|APP_ENV=production|" .env
-sed -i "s|^APP_DEBUG=.*|APP_DEBUG=false|" .env
-sed -i "s|^SESSION_DRIVER=.*|SESSION_DRIVER=database|" .env
+# Clear semua cache lama supaya .env baru terbaca
+php artisan config:clear 2>/dev/null || true
+php artisan cache:clear  2>/dev/null || true
 
-# Ensure HTTPS session settings exist in .env
-if ! grep -q '^SESSION_SECURE_COOKIE=' .env; then
-    echo "SESSION_SECURE_COOKIE=true" >> .env
-else
-    sed -i "s|^SESSION_SECURE_COOKIE=.*|SESSION_SECURE_COOKIE=true|" .env
-fi
+# Cache ulang dengan config baru
+echo "Caching configuration..."
+php artisan config:cache || echo "WARNING: config:cache failed"
+php artisan route:cache  || echo "WARNING: route:cache failed"
+php artisan view:cache   || echo "WARNING: view:cache failed"
 
-# Generate application key if not set
-php artisan key:generate --force --no-interaction 2>/dev/null || true
+# Jalankan migration
+echo "Running database migrations..."
+php artisan migrate --force || echo "WARNING: migrations failed, check DB connection"
 
-# Cache configuration
-echo "Caching Laravel configuration..."
-php artisan config:cache || echo "WARNING: config:cache failed, continuing without cache..."
-php artisan route:cache || echo "WARNING: route:cache failed, continuing without cache..."
-php artisan view:cache || echo "WARNING: view:cache failed, continuing without cache..."
-
-# Run database migrations (optional)
-if [ "${RUN_MIGRATIONS}" = "true" ]; then
-    echo "Running database migrations..."
-    php artisan migrate --force || echo "WARNING: migrations failed"
-fi
-
-# Run custom commands if passed, else start supervisord
-if [ $# -gt 0 ]; then
-    exec "$@"
-else
-    echo "Starting Supervisor..."
-    mkdir -p /var/log/supervisor
-    exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
-fi
+# Start supervisor (nginx + php-fpm)
+echo "Starting Supervisor..."
+mkdir -p /var/log/supervisor
+exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
