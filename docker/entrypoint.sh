@@ -56,6 +56,7 @@ php artisan storage:link --force 2>/dev/null || true
 sed -i "s|^APP_URL=.*|APP_URL=${APP_URL}|" .env
 sed -i "s|^APP_ENV=.*|APP_ENV=production|" .env
 sed -i "s|^APP_DEBUG=.*|APP_DEBUG=false|" .env
+sed -i "s|^SESSION_DRIVER=.*|SESSION_DRIVER=database|" .env
 
 # Ensure HTTPS session settings exist in .env
 if ! grep -q '^SESSION_SECURE_COOKIE=' .env; then
