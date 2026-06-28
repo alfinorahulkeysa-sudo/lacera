@@ -110,6 +110,22 @@ class ProductSeeder extends Seeder
                 'days_ago' => 20,
                 'image' => 'products/lacera-axillary-cream.jpeg',
             ],
+            [
+                'name' => 'Lacera Bundle Glow Set',
+                'price' => 215000,
+                'sold_count' => 40,
+                'keywords' => 'bundle',
+                'days_ago' => 3,
+                'image' => 'products/lacera-bundle-glow-set.jpeg',
+            ],
+            [
+                'name' => 'Lacera Body Care Bundle',
+                'price' => 189000,
+                'sold_count' => 25,
+                'keywords' => 'bundle',
+                'days_ago' => 5,
+                'image' => 'products/lacera-body-care-bundle.jpeg',
+            ],
         ];
 
         // Masukkan data ke dalam tabel products
@@ -119,10 +135,11 @@ class ProductSeeder extends Seeder
                 return Str::contains(Str::lower($cat->name), $data['keywords']);
             }) ?? $categories->first(); // jika tidak ada yang cocok, gunakan kategori pertama
 
-            Product::create([
+            Product::updateOrCreate([
+                'slug' => Str::slug($data['name']),
+            ], [
                 'category_id' => $matchedCategory->id,
                 'name' => $data['name'],
-                'slug' => Str::slug($data['name']),
                 'description' => 'Formula premium dari Lacera untuk perawatan kulit maksimal Anda sehari-hari.',
                 'price' => $data['price'],
                 'stock' => rand(10, 50),
