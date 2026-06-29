@@ -53,11 +53,11 @@
                 Pembayaran Lunas
             </span>
             @elseif($order->status === 'pending')
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold
-                         bg-yellow-100 text-yellow-700 border border-yellow-200">
-                <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse inline-block"></span>
-                Menunggu Pembayaran
-            </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold
+                    bg-green-100 text-green-700 border border-green-200">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
+            Pembayaran berhasil
+        </span>
             @elseif(in_array($order->status, ['failed', 'expired', 'cancelled']))
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold
                          bg-red-100 text-red-700 border border-red-200">
@@ -151,14 +151,14 @@
                 </a>
                 @elseif($order->status === 'pending' && $order->payment_url)
                 <a href="{{ $order->payment_url }}" target="_blank"
-                   class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white
-                          rounded-xl text-sm font-semibold hover:bg-yellow-600 transition">
+                class="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white
+                        rounded-xl text-sm font-semibold hover:bg-green-600 transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0
-                                 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0
+                                002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2v6a2 2 0 002 2z"/>
                     </svg>
-                    Bayar Sekarang
+                    Lihat Pembayaran
                 </a>
                 @endif
             </div>
