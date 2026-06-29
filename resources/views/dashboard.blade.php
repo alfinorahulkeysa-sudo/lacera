@@ -140,27 +140,6 @@
                         @endforeach
                     </div>
                     
-                    <div class="bg-white p-5 rounded-xl shadow-2xs border border-purple-100">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-xs font-black text-purple-700 uppercase tracking-wider">📦 PAKET HEMAT LACERA</h3>
-                            <a href="{{ url('/bundle') }}" class="text-[#d62175] hover:underline text-xs font-bold">Lihat Semua</a>
-                        </div>
-                        <div class="border border-purple-100 rounded-xl p-3 bg-purple-50/20 text-center relative">
-                            <div class="flex justify-center items-center gap-2 mb-2">
-                                <img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTtKk-09m7kA6TH9azH4G8Tdm15Ea9R1kjSnaUqBK0IILRbUJIZjyeviNoBHUQmo1xFOLEUS36bqjsnuwPuO9yqtpvXfvgM4vFKXreEIlM&usqp=CAc" class="w-12 h-12 object-contain bg-white rounded border">
-                                <span class="text-purple-400 font-bold text-sm">+</span>
-                                <img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQMUKafvoDJBsX0eqs1WFrkrXRq0qdkDzdxymnWowuuYIcFnj64EEPsLYPTrXly1SJmW87gJJmrvPIQmhCYCR_T5Sq6EHNpDgvTnI1uZufaYm2BQ6adWy6m&usqp=CAc" class="w-12 h-12 object-contain bg-white rounded border">
-                            </div>
-                            <h4 class="text-[11px] font-bold text-gray-800">Natural Collagen Soap + Natural Lip Treatment</h4>
-                            <div class="flex items-center justify-center gap-2 mt-1">
-                                <span class="text-sm font-black text-[#d62175]">Rp113.998</span>
-                                <span class="bg-purple-100 text-purple-700 text-[9px] font-black px-1.5 py-0.2 rounded-full">45% OFF</span>
-                            </div>
-                            <p class="text-[10px] text-gray-400 line-through">Rp207.647</p>
-                            <button class="w-full bg-gradient-to-r from-[#d62175] to-purple-600 text-white text-[11px] font-bold py-2 rounded-lg mt-3 shadow-xs">Tambah Ke Keranjang</button>
-                        </div>
-                    </div>
-
                     <div class="bg-white p-5 rounded-xl shadow-2xs border border-gray-100">
                         <div class="flex justify-between items-center mb-3">
                             <h3 class="text-xs font-black text-gray-400 uppercase tracking-wider">✨ PRODUK TERBARU</h3>
@@ -222,25 +201,6 @@
                         <img src="{{ asset('storage/banners/banner-bawah.jpeg') }}" class="w-full h-full object-cover" alt="Promo Buy 2 Get 1">
                     </div>
                 </div>
-
-                <div class="lg:col-span-4 bg-white p-5 rounded-xl shadow-2xs border border-gray-100 flex flex-row items-center justify-between min-h-[140px] relative overflow-hidden">
-                    <div class="flex-1 z-10">
-                        <h3 class="text-xs font-black text-gray-800 tracking-wider uppercase">CEK STATUS PESANAN</h3>
-                        <p class="text-[10px] text-gray-400 mt-0.5 mb-3">Lacak pesananmu dengan mudah</p>
-                        
-                        <form action="{{ url('/tracking') }}" method="GET" class="flex gap-2 w-full max-w-sm">
-                            <input type="text" name="order_code" placeholder="Masukkan nomor pesanan" class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-[11px] focus:outline-none focus:border-[#d62175] focus:ring-0 shadow-inner text-gray-700 placeholder-gray-300">
-                            <button type="submit" class="bg-[#d62175] hover:bg-[#b81760] text-white text-[11px] font-bold px-4 py-2 rounded-lg transition shadow-xs whitespace-nowrap">
-                                Cek Status
-                            </button>
-                        </form>
-                    </div>
-                    <div class="flex flex-col items-center justify-center opacity-80 pl-2 select-none pointer-events-none z-10">
-                        <span class="text-4xl filter drop-shadow-xs">🚚</span>
-                        <span class="text-[18px] -mt-2 filter drop-shadow-xs text-[#d62175]">📍</span>
-                    </div>
-                </div>
-
             </div>
 
         </div>
